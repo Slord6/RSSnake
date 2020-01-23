@@ -1,0 +1,20 @@
+{
+  "name": "rssnake",
+  "version": "1.0.0",
+  "description": "A simple RSS Consumer",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "RSS",
+    "client",
+    "consumer"
+  ],
+  "author": "Sam Lord",
+  "license": "MIT",
+  "dependencies": {
+    "jsdom": "^16.0.1",
+    "node-fetch": "^2.6.0"
+  }
+}
