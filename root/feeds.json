@@ -9,7 +9,8 @@
         "https://xkcd.com/rss.xml",
         "https://hackernoon.com/feed",
         "https://hackaday.com/blog/feed/",
-        "https://blogs.unity3d.com/feed/"
-        
+        "https://blogs.unity3d.com/feed/",
+        "https://www.star-made.org/news.rss",
+        "https://www.frozenbyte.com/feed/"
     ]
 }
