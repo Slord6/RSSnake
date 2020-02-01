@@ -5,15 +5,18 @@ const fetch = require('node-fetch');
 
 const port = 80;
 
-let availableColours = []
+let availableColours = [];
 let allColours = [
     { fore: "white", back: "green"},
     { fore: "white", back: "navy"},
     { fore: "black", back: "lime"},
     { fore: "black", back: "aqua"},
+    { fore: "black", back: "pink"},
     { fore: "white", back: "black"},
     { fore: "yellow", back: "black"},
-]
+    { fore: "white", back: "orange"},
+    { fore: "white", back: "maroon"}
+];
 
 function resetColours() {
     availableColours = new Array(...allColours);
