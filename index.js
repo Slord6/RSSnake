@@ -70,6 +70,7 @@ function fragsToTemplates(frags) {
             <a href='${frag.link}'>Full</a>
             <div>${decodeEntities(frag.description)}</div>
             <p>Pub: ${frag.pubDate}</p>
+            ${frag.embed}
         </div>`
         templates.push(template);
     });
@@ -88,6 +89,28 @@ function extractCdata(text) {
     text = text.replace("<![CDATA[", "");
     return text.replace("]]>", "");
 }
+function extractYoutubeEmbed(element) {
+    let media = element.querySelector('media\\:content');
+    if(media == null) return "";
+
+    let url = media.getAttribute('url');
+    url = url.split('/');
+    let videoId = url[url.length - 1].split('?')[0];
+
+    return `<iframe
+                width="100%"
+                height="315"
+                src="https://www.youtube.com/embed/${videoId}"
+                frameborder="0"
+                allow="accelerometer;
+                autoplay;
+                encrypted-media;
+                gyroscope;
+                picture-in-picture"
+                allowfullscreen
+                loading="lazy">
+        </iframe>`
+}
 function elementToFrag(element, url) {
     let link = element.querySelector('link');
     link = (link.innerHTML == null || link.innerHTML == "") ? link.getAttribute("href") : link.innerHTML;
@@ -95,6 +118,7 @@ function elementToFrag(element, url) {
     let publishElement = getChild(element, ['pubDate', "published"]);
     let descriptionElement = getChild(element, ['description', 'media\\:description']);
     let author = getChild(element, ["author name"]);
+    let embed = extractYoutubeEmbed(element);
         
     return {
         title : extractCdata(element.querySelector('title').innerHTML),
@@ -102,7 +126,8 @@ function elementToFrag(element, url) {
         link : link,
         description : extractCdata(descriptionElement.innerHTML),
         pubDate : publishElement.innerHTML,
-        author: author ? author.innerHTML : ""
+        author: author ? author.innerHTML : "",
+        embed: embed
     };
 }
 
