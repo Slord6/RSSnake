@@ -11,9 +11,6 @@ A http server that serves the content of `/root` and supports virtual paths (eg 
 
 ![Example screenshot](https://i.imgur.com/DMXMW3a.png)
 
-## Known issues
-Slight issue around CDATA being parsed at the moment, possibly content-type [related](https://github.com/jsdom/jsdom/pull/2030)?
-
 ## How to run
 
 I might do a [built](https://github.com/zeit/pkg) application at some point, but for now, it's a marginally more work:
