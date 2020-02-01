@@ -9,6 +9,8 @@ let availableColours = []
 let allColours = [
     { fore: "white", back: "green"},
     { fore: "white", back: "navy"},
+    { fore: "black", back: "lime"},
+    { fore: "black", back: "aqua"},
     { fore: "white", back: "black"},
     { fore: "yellow", back: "black"},
 ]
@@ -46,7 +48,7 @@ function fragsToTemplates(frags) {
     let templates = [];
     frags.forEach(frag => {
         let backgroundStyling = `style="background-color:${frag.colors.back}; color: ${frag.colors.fore}"`;
-        let template = `<div>
+        let template = `<div style="border: ${frag.colors.back} solid">
             <h2 ${backgroundStyling}>${frag.title}</h2>
             <h3>${frag.author || frag.host}</h3>
             <a href='https://${frag.link}'>Full</a>
@@ -65,20 +67,25 @@ function getChild(element, possibleNames) {
     });
     return res;
 }
+function extractCdata(text) {
+    // return text;
+    text = text.replace("<![CDATA[", "");
+    return text.replace("]]>", "");
+}
 function elementToFrag(element, url) {
     let link = element.querySelector('link');
     link = (link.innerHTML == null || link.innerHTML == "") ? link.getAttribute("href") : url.hostname + link.innerHTML;
     let publishElement = getChild(element, ['pubDate', "published"]);
     let descriptionElement = getChild(element, ['description', 'media\\:description']);
-    let author = getChild(element, ["author name"]).innerHTML;
-    
+    let author = getChild(element, ["author name"]);
+        
     return {
-        title : element.querySelector('title').innerHTML,
+        title : extractCdata(element.querySelector('title').innerHTML),
         host: url.hostname,
         link : link,
-        description : descriptionElement.innerHTML,
+        description : extractCdata(descriptionElement.innerHTML),
         pubDate : publishElement.innerHTML,
-        author: author || ""
+        author: author ? author.innerHTML : ""
     };
 }
 

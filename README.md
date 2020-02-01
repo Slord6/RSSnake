@@ -1,6 +1,6 @@
 # RSSnake 🐍🌐
 
-An RSS consumer with simple, retro styling.
+An RSS consumer with simple, slightly garish, retro styling.
 
 Inspiration + initial code taken from this [repo](https://github.com/hongkiat/js-rss-reader/).
 
@@ -9,21 +9,10 @@ A http server that serves the content of `/root` and supports virtual paths (eg 
 
 ## Screenshot
 
-![Example screenshot](https://i.imgur.com/axhNzij.png)
+![Example screenshot](https://i.imgur.com/DMXMW3a.png)
 
 ## Known issues
 Slight issue around CDATA being parsed at the moment, possibly content-type [related](https://github.com/jsdom/jsdom/pull/2030)?
-
-## Improvements
-
-Some things that would make this far more useful:
-
- - REST-like endpoint(s) for:
-    - Add/remove feeds
-    - Mark as read/unread
-- Sort feeds by `pubDate`, intersperse with each other
-    - Filter by feed
-- Specify port as arg
 
 ## How to run
 
@@ -33,3 +22,13 @@ I might do a [built](https://github.com/zeit/pkg) application at some point, but
 - `npm i` in project dir
 - `node index.js`
 - Point browser to `localhost:80`, `/rss` for the rss view.
+
+## Improvements
+
+Some things that would make this more useful:
+
+ - REST-like endpoint(s) for:
+    - Add/remove feeds
+    - Mark as read/unread
+- Filter by feed
+- Specify port as arg

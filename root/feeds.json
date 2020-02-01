@@ -4,7 +4,8 @@
         "https://hacks.mozilla.org/feed/",
         "https://www.youtube.com/feeds/videos.xml?channel_id=UCOgGAfSUy5LvEyVS_LF5kdw",
         "https://www.youtube.com/feeds/videos.xml?channel_id=UC5rUMdCFWPXYs9e8PBLzq5g",
-        "https://www.youtube.com/feeds/videos.xml?channel_id=UCH-_hzb2ILSCo9ftVSnrCIQ"
+        "https://www.youtube.com/feeds/videos.xml?channel_id=UCH-_hzb2ILSCo9ftVSnrCIQ",
+        "https://hnrss.org/frontpage"
         
     ]
 }
