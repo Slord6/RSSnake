@@ -41,6 +41,22 @@ function fragsToHtml(items) {
         ${fragsToTemplates(frags).join("\r\n")}
     </html>`;
 }
+function decodeEntities(encodedString) {
+    var translate_re = /&(nbsp|amp|quot|lt|gt);/g;
+    var translate = {
+        "nbsp":" ",
+        "amp" : "&",
+        "quot": "\"",
+        "lt"  : "<",
+        "gt"  : ">"
+    };
+    return encodedString.replace(translate_re, function(match, entity) {
+        return translate[entity];
+    }).replace(/&#(\d+);/gi, function(match, numStr) {
+        var num = parseInt(numStr, 10);
+        return String.fromCharCode(num);
+    });
+}
 function fragsToTemplates(frags) {
     frags = frags.sort((a, b) => {
         return new Date(b.pubDate) - new Date(a.pubDate);
@@ -51,8 +67,8 @@ function fragsToTemplates(frags) {
         let template = `<div style="border: ${frag.colors.back} solid">
             <h2 ${backgroundStyling}>${frag.title}</h2>
             <h3>${frag.author || frag.host}</h3>
-            <a href='https://${frag.link}'>Full</a>
-            <p>${frag.description}</p>
+            <a href='${frag.link}'>Full</a>
+            <div>${decodeEntities(frag.description)}</div>
             <p>Pub: ${frag.pubDate}</p>
         </div>`
         templates.push(template);
@@ -74,7 +90,8 @@ function extractCdata(text) {
 }
 function elementToFrag(element, url) {
     let link = element.querySelector('link');
-    link = (link.innerHTML == null || link.innerHTML == "") ? link.getAttribute("href") : url.hostname + link.innerHTML;
+    link = (link.innerHTML == null || link.innerHTML == "") ? link.getAttribute("href") : link.innerHTML;
+    if(!link.includes("http")) link = "https://" + link;
     let publishElement = getChild(element, ['pubDate', "published"]);
     let descriptionElement = getChild(element, ['description', 'media\\:description']);
     let author = getChild(element, ["author name"]);

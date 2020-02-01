@@ -7,6 +7,13 @@ body{
 	margin: auto;
 	text-align: center;
 }
+body > div > div {
+	max-width: 100%;
+	overflow: hidden;
+}
+body > div > div > * {
+	max-width: 100%;
+}
 h2{
 	margin-bottom: 2px;
 	font-size: 16pt;
