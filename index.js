@@ -44,7 +44,7 @@ function fragsToHtml(items) {
 function decodeEntities(encodedString) {
     var translate_re = /&(nbsp|amp|quot|lt|gt);/g;
     var translate = {
-        "nbsp":" ",
+        "nbsp": " ",
         "amp" : "&",
         "quot": "\"",
         "lt"  : "<",
@@ -97,18 +97,7 @@ function extractYoutubeEmbed(element) {
     url = url.split('/');
     let videoId = url[url.length - 1].split('?')[0];
 
-    return `<iframe
-                width="100%"
-                height="315"
-                src="https://www.youtube.com/embed/${videoId}"
-                frameborder="0"
-                allow="accelerometer;
-                autoplay;
-                encrypted-media;
-                gyroscope;
-                picture-in-picture"
-                allowfullscreen
-                loading="lazy">
+    return `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" loading="lazy" allowfullscreen>
         </iframe>`
 }
 function elementToFrag(element, url) {
@@ -116,9 +105,9 @@ function elementToFrag(element, url) {
     link = (link.innerHTML == null || link.innerHTML == "") ? link.getAttribute("href") : link.innerHTML;
     if(!link.includes("http")) link = "https://" + link;
     let publishElement = getChild(element, ['pubDate', "published"]);
-    let descriptionElement = getChild(element, ['description', 'media\\:description']);
+    let descriptionElement = getChild(element, ['description', 'media\\:description', 'content\\:encoded']);
     let author = getChild(element, ["author name"]);
-    let embed = extractYoutubeEmbed(element);
+    let embed = url.host.includes("youtube.com") ? extractYoutubeEmbed(element) : "";
         
     return {
         title : extractCdata(element.querySelector('title').innerHTML),
