@@ -5,11 +5,57 @@ const fetch = require('node-fetch');
 
 const port = 80;
 
-function msleep(n) {
-    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, n);
-  }
-function sleep(n) {
-    msleep(n*1000);
+let availableColours = []
+let allColours = [
+    { fore: "white", back: "green"},
+    { fore: "white", back: "navy"},
+    { fore: "white", back: "black"},
+    { fore: "yellow", back: "black"},
+]
+
+function resetColours() {
+    availableColours = new Array(...allColours);
+}
+function getNextColourPair() {
+    if(availableColours.length == 0) {
+        resetColours();
+    }
+    return availableColours.pop();
+}
+function assignColours(items) {
+    resetColours();
+    items.forEach(frags => {
+        let colors = getNextColourPair();
+        frags.forEach(frag => frag.colors = colors);
+    });
+}
+function fragsToHtml(items) {
+    assignColours(items);
+    let frags = items.flat();
+    return `<html>
+        <head>
+            <link rel="stylesheet" type="text/css" href="/style-rss.css">
+        </head>
+        ${fragsToTemplates(frags).join("\r\n")}
+    </html>`;
+}
+function fragsToTemplates(frags) {
+    frags = frags.sort((a, b) => {
+        return new Date(b.pubDate) - new Date(a.pubDate);
+    });
+    let templates = [];
+    frags.forEach(frag => {
+        let backgroundStyling = `style="background-color:${frag.colors.back}; color: ${frag.colors.fore}"`;
+        let template = `<div>
+            <h2 ${backgroundStyling}>${frag.title}</h2>
+            <h3>${frag.host}</h3>
+            <a href='https://${frag.link}'>Full</a>
+            <p>${frag.description}</p>
+            <p>Pub: ${frag.pubDate}</p>
+        </div>`
+        templates.push(template);
+    });
+    return templates;
 }
 
 server.addVirtualPath('/rss', (req, res) => {
@@ -28,47 +74,34 @@ server.addVirtualPath('/rss', (req, res) => {
                 return fetch(url)
                     .then(rssRes => rssRes.text())
                     .then((xmlTxt) => {
-                            let frag = "";
+                            let frags = [];
                             /* Parse the RSS Feed and display the content */
                             try {
                                 let doc = new JSDOM(xmlTxt, { contentType: "application/xml" }).window.document;
-                                let title = doc.querySelector("channel").querySelector("title").innerHTML;
-                                let heading = `<a name=${title.split(" ").join("_")}><h1>${title}</h1></a>`;
-                                frag += heading;
                                 doc.querySelectorAll('item').forEach((item) => {
                                     let itemData = {
                                         title : item.querySelector('title').innerHTML,
+                                        host: url.hostname,
                                         link : url.hostname + item.querySelector('link').innerHTML,
                                         description : item.querySelector('description').innerHTML,
                                         pubDate : item.querySelector('pubDate').innerHTML
                                     };
-                                    let template = `<div>
-                                        <h2>${itemData.title}</h2>
-                                        <h3>${url.hostname}</h3>
-                                        <a href='${itemData.link}'>Full</a>
-                                        <p>${itemData.description}</p>
-                                        <p>Pub: ${itemData.pubDate}</p>
-                                    </div>`
-                                    frag += template;
+                                    frags.push(itemData);
                                 })
                             } catch (e) {
                                 console.error('Error in parsing the feed', e);
                             }
-                            return frag;
+                            return frags;
                     }).catch(() => {
                         console.error('Error in fetching the RSS feed');
                         console.log(res);
                         res.status = 500;
                         res.end("Error in fetching RSS feed");
                     });
-            })).then(frags => {
+            })).then(items => {
                 res.setHeader('Content-type', "text/html; charset=UTF-8");
-                let fullPage = `<html>
-                                    <head>
-                                        <link rel="stylesheet" type="text/css" href="/style-rss.css">
-                                    </head>
-                                    ${frags.join("\r\n")}
-                                </html>`;
+                
+                let fullPage = fragsToHtml(items);
                 res.end(fullPage);
             });
         });
