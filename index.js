@@ -48,7 +48,7 @@ function fragsToTemplates(frags) {
         let backgroundStyling = `style="background-color:${frag.colors.back}; color: ${frag.colors.fore}"`;
         let template = `<div>
             <h2 ${backgroundStyling}>${frag.title}</h2>
-            <h3>${frag.host}</h3>
+            <h3>${frag.author || frag.host}</h3>
             <a href='https://${frag.link}'>Full</a>
             <p>${frag.description}</p>
             <p>Pub: ${frag.pubDate}</p>
@@ -56,6 +56,30 @@ function fragsToTemplates(frags) {
         templates.push(template);
     });
     return templates;
+}
+function getChild(element, possibleNames) {
+    let res = null;
+    possibleNames.forEach(name => {
+        if(res !== null) return;
+        res = element.querySelector(name);
+    });
+    return res;
+}
+function elementToFrag(element, url) {
+    let link = element.querySelector('link');
+    link = (link.innerHTML == null || link.innerHTML == "") ? link.getAttribute("href") : url.hostname + link.innerHTML;
+    let publishElement = getChild(element, ['pubDate', "published"]);
+    let descriptionElement = getChild(element, ['description', 'media\\:description']);
+    let author = getChild(element, ["author name"]).innerHTML;
+    
+    return {
+        title : element.querySelector('title').innerHTML,
+        host: url.hostname,
+        link : link,
+        description : descriptionElement.innerHTML,
+        pubDate : publishElement.innerHTML,
+        author: author || ""
+    };
 }
 
 server.addVirtualPath('/rss', (req, res) => {
@@ -78,15 +102,10 @@ server.addVirtualPath('/rss', (req, res) => {
                             /* Parse the RSS Feed and display the content */
                             try {
                                 let doc = new JSDOM(xmlTxt, { contentType: "application/xml" }).window.document;
-                                doc.querySelectorAll('item').forEach((item) => {
-                                    let itemData = {
-                                        title : item.querySelector('title').innerHTML,
-                                        host: url.hostname,
-                                        link : url.hostname + item.querySelector('link').innerHTML,
-                                        description : item.querySelector('description').innerHTML,
-                                        pubDate : item.querySelector('pubDate').innerHTML
-                                    };
-                                    frags.push(itemData);
+                                let elements = doc.querySelectorAll('item');
+                                if(elements.length == 0) elements = doc.querySelectorAll('entry');
+                                elements.forEach((element) => {
+                                    frags.push(elementToFrag(element, url));
                                 })
                             } catch (e) {
                                 console.error('Error in parsing the feed', e);
