@@ -26,6 +26,17 @@ server.addVirtualPath('/rss/addFeed', (req, res) => {
         feedUrls.text().then((data) => {
             resolveBody(req, (newFeeds) => {
                 newFeeds = JSON.parse(newFeeds);
+                for (let i = 0; i < newFeeds.urls.length; i++) {
+                    const feed = newFeeds.urls[i];
+                    try {
+                        let url = new URL(feed);
+                    }
+                    catch {
+                        res.statusCode = 422;
+                        res.end("Invalid url - " + feed);
+                        return;
+                    }
+                }
                 let urlData = JSON.parse(data);
                 let merged =  { urls: urlData.urls.concat(newFeeds.urls) };
                 fs.writeFileSync(feedsFilePath, JSON.stringify(merged, null, '\t'));

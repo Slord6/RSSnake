@@ -1,0 +1,26 @@
+#enteredFeed {
+    width: 600px;
+}
+.button {
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+.button:hover {
+    outline: solid black 2px;
+}
+#addButton {
+    background-color: green;
+}
+#removeButton {
+    background-color: red;
+}
+header {
+    background-color: green;
+    color: white;
+    text-align: center;
+}

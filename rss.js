@@ -153,7 +153,7 @@ const handleFeedRequest = function(req, res, feedsLocation) {
                     }).catch(() => {
                         console.error('Error in fetching the RSS feed');
                         console.log(res);
-                        res.status = 500;
+                        res.statusCode = 500;
                         res.end("Error in fetching RSS feed");
                     });
             })).then(items => {
@@ -165,7 +165,7 @@ const handleFeedRequest = function(req, res, feedsLocation) {
         });
     }).catch((e) => {
         console.error('Error in fetching the URLs json', e);
-        res.status = 500;
+        res.statusCode = 500;
         res.end("Error in parsing feed");
     });
 }

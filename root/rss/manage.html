@@ -1,0 +1,21 @@
+<html>
+    <head>
+        <script src="/rss/manage-rss.js"></script>
+        <link rel="stylesheet" type="text/css" href="/rss/manage-rss.css">
+    </head>
+    <header>
+        <h1>Manage Feeds</h1>
+    </header>
+    <hr>
+    <h2>Current Feeds</h2>
+    <div id="currentFeeds"></div>
+    <hr>
+    <h2>Add/Remove a feed</h2>
+    <form>
+        Feed:<br>
+        <input id="enteredFeed" type="url" name="feed" value="">
+        <br><br>
+    </form>
+    <input class="button" id="addButton" type="submit" value="Add" onclick="addFeed()">
+    <input class="button" id="removeButton" type="submit" value="Remove" onclick="removeFeed()">
+</html>

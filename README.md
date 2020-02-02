@@ -20,12 +20,27 @@ I might do a [built](https://github.com/zeit/pkg) application at some point, but
 - `node index.js`
 - Point browser to `localhost:80`, `/rss` for the rss view.
 
+# Manage Feeds
+
+Head to `/rss/manage`. You can either enter a new url and click `Add` or enter a current url and click `Remove`. then head to `/rss` to see your updated feed.
+
+Feeds can also be managed programatically with a http `POST` call to `/rss/addFeed` and `/rss/removeFeed`. The expected object is of the format:
+
+```JSON
+{
+    "urls": [
+        "http://example.com/rss.xml",
+        "http://example.com/rss2.xml",
+        "..."
+    ]
+}
+```
+
 ## Improvements
 
 Some things that would make this more useful:
 
  - REST-like endpoint(s) for:
-    - Add/remove feeds
     - Mark as read/unread
 - Filter by feed
 - Specify port as arg

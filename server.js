@@ -38,34 +38,56 @@ const start = (port, rootPath) => {
             '.doc': 'application/msword'
         };
 
-        fs.exists(pathname, function (exist) {
-            if(!exist) {
-                let validVirtual = virtualPaths.filter((virtPath) => virtPath.path == parsedUrl.path);
-                if(validVirtual.length > 0) {
-                    console.log("Handled by virtual path handler");
-                    validVirtual[0].handler(req, res);
-                    return;
-                }
-                // if the file is not found, return 404
-                res.statusCode = 404;
-                res.end(`File ${pathname} not found!`);
-                return;
-            }
+        let validVirtual = virtualPaths.filter((virtPath) => virtPath.path == parsedUrl.path);
+        if(validVirtual.length > 0) {
+            console.log("Handled by virtual path handler");
+            validVirtual[0].handler(req, res);
+            return;
+        }
 
-            // if is a directory search for index file matching the extention
-            if (fs.statSync(pathname).isDirectory()) pathname += '/index' + (ext || ".html");
+        const sendFourOFour = (res) => {
+            res.statusCode = 404;
+            res.end(`File not found!`);
+        };
 
+        const sendFile = (path, res) => {
             // read file from file system
-            fs.readFile(pathname, function(err, data){
-            if(err){
-                res.statusCode = 500;
-                res.end(`Error getting the file: ${err}.`);
-            } else {
-                // if the file is found, set Content-type and send data
-                res.setHeader('Content-type', map[ext] || 'text/html' );
-                res.end(data);
-            }
+            fs.readFile(path, function(err, data){
+                if(err){
+                    sendFourOFour(res);
+                    return;
+                } else {
+                    // if the file is found, set Content-type and send data
+                    res.setHeader('Content-type', map[ext] || 'text/html' );
+                    res.end(data);
+                }
             });
+        };
+
+        fs.exists(pathname, (exist) => {
+            if(!exist) {
+                fs.exists(pathname + ".html", (exist) => {
+                    if(exist) {
+                        sendFile(pathname + ".html", res);
+                        return;
+                    } else {
+                        sendFourOFour(res);
+                        return;
+                    }
+                });
+            } else {
+                // if is a directory search for index file matching the extention
+                if (fs.statSync(pathname).isDirectory()) pathname += '/index' + (ext || ".html");
+                fs.exists(pathname, (exist) => {
+                    if(exist) {
+                        sendFile(pathname, res);
+                        return;
+                    } else {
+                        sendFourOFour(res);
+                    }
+                });
+            }
+                    
         });
 
     }).listen(parseInt(port));
