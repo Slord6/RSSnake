@@ -1,0 +1,10 @@
+header {
+    background-color: green;
+    color: white;
+    text-align: center;
+}
+body {
+    text-align: center;
+    font-size: 18px;
+    line-height: 50px;
+}
