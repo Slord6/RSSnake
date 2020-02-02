@@ -1,174 +1,62 @@
 const server = require('./server');
-const jsdom = require("jsdom");
-const { JSDOM } = jsdom;
+const rss = require('./rss');
 const fetch = require('node-fetch');
+const fs = require('fs');
 
 const port = 80;
+const feedsFilePath = "./root/feeds.json";
+const feedsUrl = `http://localhost:${port}/feeds.json`;
 
-let availableColours = [];
-let allColours = [
-    { fore: "white", back: "green"},
-    { fore: "white", back: "navy"},
-    { fore: "black", back: "lime"},
-    { fore: "black", back: "aqua"},
-    { fore: "black", back: "pink"},
-    { fore: "white", back: "black"},
-    { fore: "yellow", back: "black"},
-    { fore: "white", back: "orange"},
-    { fore: "white", back: "maroon"}
-];
-
-function resetColours() {
-    availableColours = new Array(...allColours);
-}
-function getNextColourPair() {
-    if(availableColours.length == 0) {
-        resetColours();
-    }
-    return availableColours.pop();
-}
-function assignColours(items) {
-    resetColours();
-    items.forEach(frags => {
-        let colors = getNextColourPair();
-        frags.forEach(frag => frag.colors = colors);
+function resolveBody(req, cb) {
+    let body = '';
+    req.on('data', chunk => {
+        body += chunk.toString();
     });
-}
-function fragsToHtml(items) {
-    assignColours(items);
-    let frags = items.flat();
-    return `<html>
-        <head>
-            <link rel="stylesheet" type="text/css" href="/style-rss.css">
-        </head>
-        ${fragsToTemplates(frags).join("\r\n")}
-    </html>`;
-}
-function decodeEntities(encodedString) {
-    var translate_re = /&(nbsp|amp|quot|lt|gt);/g;
-    var translate = {
-        "nbsp": " ",
-        "amp" : "&",
-        "quot": "\"",
-        "lt"  : "<",
-        "gt"  : ">"
-    };
-    return encodedString.replace(translate_re, function(match, entity) {
-        return translate[entity];
-    }).replace(/&#(\d+);/gi, function(match, numStr) {
-        var num = parseInt(numStr, 10);
-        return String.fromCharCode(num);
+    req.on('end', () => {
+        cb(body);
     });
-}
-function fragsToTemplates(frags) {
-    frags = frags.sort((a, b) => {
-        return new Date(b.pubDate) - new Date(a.pubDate);
-    });
-    let templates = [];
-    frags.forEach(frag => {
-        let backgroundStyling = `style="background-color:${frag.colors.back}; color: ${frag.colors.fore}"`;
-        let template = `<div style="border: ${frag.colors.back} solid">
-            <h2 ${backgroundStyling}>${frag.title}</h2>
-            <h3>${frag.author || frag.host}</h3>
-            <a href='${frag.link}'>Full</a>
-            <div>${decodeEntities(frag.description)}</div>
-            <p>Pub: ${frag.pubDate}</p>
-            ${frag.embed}
-        </div>`
-        templates.push(template);
-    });
-    return templates;
-}
-function getChild(element, possibleNames) {
-    let res = null;
-    possibleNames.forEach(name => {
-        if(res !== null) return;
-        res = element.querySelector(name);
-    });
-    return res;
-}
-function extractCdata(text) {
-    // return text;
-    text = text.replace("<![CDATA[", "");
-    return text.replace("]]>", "");
-}
-function extractYoutubeEmbed(element) {
-    let media = element.querySelector('media\\:content');
-    if(media == null) return "";
-
-    let url = media.getAttribute('url');
-    url = url.split('/');
-    let videoId = url[url.length - 1].split('?')[0];
-
-    return `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" loading="lazy" allowfullscreen>
-        </iframe>`
-}
-function elementToFrag(element, url) {
-    let link = element.querySelector('link');
-    link = (link.innerHTML == null || link.innerHTML == "") ? link.getAttribute("href") : link.innerHTML;
-    if(!link.includes("http")) link = "https://" + link;
-    let publishElement = getChild(element, ['pubDate', "published"]);
-    let descriptionElement = getChild(element, ['description', 'media\\:description', 'content\\:encoded']);
-    let author = getChild(element, ["author name"]);
-    let embed = url.host.includes("youtube.com") ? extractYoutubeEmbed(element) : "";
-        
-    return {
-        title : extractCdata(element.querySelector('title').innerHTML),
-        host: url.hostname,
-        link : link,
-        description : extractCdata(descriptionElement.innerHTML),
-        pubDate : publishElement.innerHTML,
-        author: author ? author.innerHTML : "",
-        embed: embed
-    };
 }
 
 server.addVirtualPath('/rss', (req, res) => {
-    fetch(`http://localhost:${port}/feeds.json`).then((feedUrls) => {
+    rss.handleFeedRequest(req, res, feedsUrl);
+});
+
+server.addVirtualPath('/rss/addFeed', (req, res) => {
+    fetch(feedsUrl).then((feedUrls) => {
         feedUrls.text().then((data) => {
-            let counter = 0;
-            let urls = JSON.parse(data).urls;
-            Promise.all(urls.map(u => {
-                try {
-                    var url = new URL(u);
-                }
-                catch (e) {
-                    console.error('URL invalid', u);
-                    return;
-                }
-                return fetch(url)
-                    .then(rssRes => rssRes.text())
-                    .then((xmlTxt) => {
-                            let frags = [];
-                            /* Parse the RSS Feed and display the content */
-                            try {
-                                let doc = new JSDOM(xmlTxt, { contentType: "application/xml" }).window.document;
-                                let elements = doc.querySelectorAll('item');
-                                if(elements.length == 0) elements = doc.querySelectorAll('entry');
-                                elements.forEach((element) => {
-                                    frags.push(elementToFrag(element, url));
-                                })
-                            } catch (e) {
-                                console.error('Error in parsing the feed', e);
-                            }
-                            return frags;
-                    }).catch(() => {
-                        console.error('Error in fetching the RSS feed');
-                        console.log(res);
-                        res.status = 500;
-                        res.end("Error in fetching RSS feed");
-                    });
-            })).then(items => {
-                res.setHeader('Content-type', "text/html; charset=UTF-8");
-                
-                let fullPage = fragsToHtml(items);
-                res.end(fullPage);
+            resolveBody(req, (newFeeds) => {
+                newFeeds = JSON.parse(newFeeds);
+                let urlData = JSON.parse(data);
+                let merged =  { urls: urlData.urls.concat(newFeeds.urls) };
+                fs.writeFileSync(feedsFilePath, JSON.stringify(merged, null, '\t'));
+                res.status = 200;
+                res.end();
             });
         });
-    }).catch((e) => {
-        console.error('Error in fetching the URLs json', e);
-        res.status = 500;
-        res.end("Error in parsing feed");
     });
 });
+
+server.addVirtualPath('/rss/removeFeed', (req, res) => {
+    fetch(feedsUrl).then((feedUrls) => {
+        feedUrls.text().then((data) => {
+            resolveBody(req, (removalFeeds) => {
+                removalFeeds = JSON.parse(removalFeeds);
+                let urlData = JSON.parse(data);
+
+                for (let i = 0; i < removalFeeds.urls.length; i++) {
+                    const removal = removalFeeds.urls[i];
+                    let index = urlData.urls.indexOf(removal);
+                    if(index > -1) {
+                        urlData.urls.splice(index, 1);
+                    }
+                }
+
+                fs.writeFileSync(feedsFilePath, JSON.stringify(urlData, null, '\t'));
+                res.status = 200;
+                res.end();
+            });
+        });
+    });
+});
+
 server.start(port, './root');
