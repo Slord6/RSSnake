@@ -6,13 +6,19 @@ let availableColours = [];
 let allColours = [
     { fore: "white", back: "green"},
     { fore: "white", back: "navy"},
+    { fore: "white", back: "BlueViolet"},
+    { fore: "white", back: "lavender"},
+    { fore: "white", back: "olive"},
     { fore: "black", back: "lime"},
     { fore: "black", back: "aqua"},
     { fore: "black", back: "pink"},
+    { fore: "black", back: "violet"},
     { fore: "white", back: "black"},
-    { fore: "yellow", back: "black"},
     { fore: "white", back: "orange"},
-    { fore: "white", back: "maroon"}
+    { fore: "white", back: "maroon"},
+    { fore: "white", back: "purple"},
+    { fore: "white", back: "brown"},
+    { fore: "white", back: "grey"}
 ];
 
 function resetColours() {
