@@ -20,6 +20,11 @@ I might do a [built](https://github.com/zeit/pkg) application at some point, but
 - `node index.js`
 - Point browser to `localhost:80`, `/rss` for the rss view.
 
+You can also pass arguments to `index.js` with the format `name:value`.
+
+Currently available config:
+- `port:<number>`: Default - `port:80`
+
 # Manage Feeds
 
 Head to `/rss/manage`. You can either enter a new url and click `Add` or enter a current url and click `Remove`. then head to `/rss` to see your updated feed.
@@ -43,4 +48,3 @@ Some things that would make this more useful:
  - REST-like endpoint(s) for:
     - Mark as read/unread
 - Filter by feed
-- Specify port as arg

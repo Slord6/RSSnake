@@ -3,9 +3,22 @@ const rss = require('./rss');
 const fetch = require('node-fetch');
 const fs = require('fs');
 
-const port = 80;
+const config = {
+    port: 80
+};
 const feedsFilePath = "./root/feeds.json";
-const feedsUrl = `http://localhost:${port}/feeds.json`;
+let feedsUrl;
+
+function resolveSettings() {
+    for (let i = 0; i < process.argv.length; i++) {
+        if(i <= 1) continue; //ignore node call and index file location
+    
+        const arg = process.argv[i];
+        const info = arg.split(":");
+        config[info[0]] = info [1];
+    }
+    feedsUrl = `http://localhost:${config.port}/feeds.json`;
+}
 
 function resolveBody(req, cb) {
     let body = '';
@@ -16,6 +29,8 @@ function resolveBody(req, cb) {
         cb(body);
     });
 }
+
+resolveSettings();
 
 server.addVirtualPath('/rss', (req, res) => {
     rss.handleFeedRequest(req, res, feedsUrl);
@@ -70,4 +85,4 @@ server.addVirtualPath('/rss/removeFeed', (req, res) => {
     });
 });
 
-server.start(port, './root');
+server.start(config.port, './root');
