@@ -38,7 +38,7 @@ const start = (port, rootPath) => {
             '.doc': 'application/msword'
         };
 
-        let validVirtual = virtualPaths.filter((virtPath) => virtPath.path == parsedUrl.path);
+        let validVirtual = virtualPaths.filter((virtPath) => virtPath.path == parsedUrl.pathname);
         if(validVirtual.length > 0) {
             console.log("Handled by virtual path handler");
             validVirtual[0].handler(req, res);

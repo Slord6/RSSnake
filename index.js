@@ -1,4 +1,5 @@
 const server = require('./server');
+const querystring = require('querystring');
 const rss = require('./rss');
 const fetch = require('node-fetch');
 const fs = require('fs');
@@ -33,7 +34,13 @@ function resolveBody(req, cb) {
 resolveSettings();
 
 server.addVirtualPath('/rss', (req, res) => {
-    rss.handleFeedRequest(req, res, feedsUrl);
+    let feedsLoc = feedsUrl;
+    try{
+        let query = querystring.parse(req.url.split('?')[1]);
+        console.log(query);
+        if(query['feeds']) feedsLoc = query['feeds'];
+    } catch {}
+    rss.handleFeedRequest(req, res, feedsLoc);
 });
 
 server.addVirtualPath('/rss/addFeed', (req, res) => {

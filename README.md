@@ -27,7 +27,11 @@ Currently available config:
 
 # Manage Feeds
 
+## GUI
+
 Head to `/rss/manage`. You can either enter a new url and click `Add` or enter a current url and click `Remove`. then head to `/rss` to see your updated feed.
+
+## Programatically
 
 Feeds can also be managed programatically with a http `POST` call to `/rss/addFeed` and `/rss/removeFeed`. The expected object is of the format:
 
@@ -40,6 +44,11 @@ Feeds can also be managed programatically with a http `POST` call to `/rss/addFe
     ]
 }
 ```
+An example of which you will find at the `/feeds.json` endpoint, where the current feeds are served.
+
+If you wish to manage feeds completely separately from RSSnake the `/rss` endpoint accepts a query parameter of `feeds`. This allows another http service to serve up a correctly formatted urls JSON which will be interpreted by RSSnake.
+
+For example, if RSSnake is hosted locally then `http://localhost/rss?feeds=http://remote/externalfeeds` will parse the contents of `http://remote/externalfeeds` which is expected to be of the JSON format shown above. See the `/feeds.json` endpoint for an example.
 
 ## Improvements
 

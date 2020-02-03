@@ -125,7 +125,15 @@ const handleFeedRequest = function(req, res, feedsLocation) {
     fetch(feedsLocation).then((feedUrls) => {
         feedUrls.text().then((data) => {
             let counter = 0;
-            let urls = JSON.parse(data).urls;
+            let urls;
+            try {
+                urls = JSON.parse(data).urls;
+            } catch(e) {
+                console.error('Invalid feeds data', e);
+                res.statusCode = 500;
+                res.end("Feeds list JSON was incrorectly formatted at " + feedsLocation);
+                return;
+            }
             Promise.all(urls.map(u => {
                 try {
                     var url = new URL(u);
