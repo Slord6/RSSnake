@@ -85,7 +85,6 @@ function getChild(element, possibleNames) {
     return res;
 }
 function extractCdata(text) {
-    // return text;
     text = text.replace("<![CDATA[", "");
     return text.replace("]]>", "");
 }
