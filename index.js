@@ -37,7 +37,6 @@ server.addVirtualPath('/rss', (req, res) => {
     let feedsLoc = feedsUrl;
     try{
         let query = querystring.parse(req.url.split('?')[1]);
-        console.log(query);
         if(query['feeds']) feedsLoc = query['feeds'];
     } catch {}
     rss.handleFeedRequest(req, res, feedsLoc);
