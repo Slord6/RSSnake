@@ -7,7 +7,7 @@ let allColours = [
     { fore: "white", back: "green"},
     { fore: "white", back: "navy"},
     { fore: "white", back: "BlueViolet"},
-    { fore: "white", back: "lavender"},
+    { fore: "black", back: "lime"},
     { fore: "white", back: "olive"},
     { fore: "black", back: "lime"},
     { fore: "black", back: "aqua"},
@@ -129,7 +129,6 @@ function elementToFrag(element, url) {
 const handleFeedRequest = function(req, res, feedsLocation) {
     fetch(feedsLocation).then((feedUrls) => {
         feedUrls.text().then((data) => {
-            let counter = 0;
             let urls;
             try {
                 urls = JSON.parse(data).urls;
@@ -163,9 +162,10 @@ const handleFeedRequest = function(req, res, feedsLocation) {
                                 console.error('Error in parsing the feed', e);
                             }
                             return frags;
-                    }).catch(() => {
+                    }).catch((e) => {
                         console.error('Error in fetching the RSS feed');
-                        console.log(res);
+                        console.log(url);
+                        console.error(e);
                         res.statusCode = 500;
                         res.end("Error in fetching RSS feed");
                     });
