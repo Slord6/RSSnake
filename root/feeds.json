@@ -18,6 +18,9 @@
 		"https://flak.tedunangst.com/rss",
 		"https://susam.in/blog/rss.xml",
 		"http://www.linusakesson.net/rssfeed.php",
-		"https://www.youtube.com/feeds/videos.xml?channel_id=UCmtyQOKKmrMVaKuRXz02jbQ"
+		"https://www.youtube.com/feeds/videos.xml?channel_id=UCmtyQOKKmrMVaKuRXz02jbQ",
+		"https://www.youtube.com/feeds/videos.xml?channel_id=UC8YMVhioY0gp7zpPYHl779g",
+		"https://www.youtube.com/feeds/videos.xml?channel_id=UCb31gOY6OD8ES0zP8M0GhAw",
+		"http://feeds.kottke.org/main"
 	]
 }
