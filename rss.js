@@ -91,6 +91,7 @@ function getChild(element, possibleNames) {
     return res;
 }
 function extractCdata(text) {
+    if(text === null) return "";
     text = text.replace("<![CDATA[", "");
     return text.replace("]]>", "");
 }
@@ -118,7 +119,7 @@ function elementToFrag(element, url) {
         title : extractCdata(element.querySelector('title').innerHTML),
         host: url.hostname,
         link : link,
-        description : extractCdata(descriptionElement.innerHTML),
+        description : descriptionElement ? extractCdata(descriptionElement.innerHTML) : "",
         pubDate : publishElement.innerHTML,
         author: author ? author.innerHTML : "",
         embed: embed
@@ -159,11 +160,11 @@ const handleFeedRequest = function(req, res, feedsLocation) {
                                     frags.push(elementToFrag(element, url));
                                 })
                             } catch (e) {
-                                console.error('Error in parsing the feed', e);
+                                console.error('Error in parsing the feed', e, url);
                             }
                             return frags;
                     }).catch((e) => {
-                        console.error('Error in fetching the RSS feed');
+                        console.error('Error in fetching the RSS feed', e, url);
                         console.log(url);
                         console.error(e);
                         res.statusCode = 500;
