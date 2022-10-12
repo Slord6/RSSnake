@@ -1,4 +1,4 @@
-html	{
+html{
 	font-family: 'Arial', serif;
 	font-size: 11pt;
 }
@@ -34,4 +34,7 @@ p{
 h1 {
 	text-indent: 5px;
 	font-size: 36pt;
+}
+img{
+	max-width: 100%;
 }

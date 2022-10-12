@@ -111,7 +111,7 @@ function elementToFrag(element, url) {
     link = (link.innerHTML == null || link.innerHTML == "") ? link.getAttribute("href") : link.innerHTML;
     if(!link.includes("http")) link = "https://" + link;
     let publishElement = getChild(element, ['pubDate', "published"]);
-    let descriptionElement = getChild(element, ['description', 'media\\:description', 'content\\:encoded', 'summary']);
+    let descriptionElement = getChild(element, ['content\\:encoded', 'description', 'media\\:description', 'summary']);
     let author = getChild(element, ["author name"]);
     let embed = url.host.includes("youtube.com") ? extractYoutubeEmbed(element) : "";
         
