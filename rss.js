@@ -106,6 +106,16 @@ function extractYoutubeEmbed(element) {
     return `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" loading="lazy" allowfullscreen>
         </iframe>`
 }
+function extractAudioEmbed(element) {
+    const audioElement = getChild(element, ["enclosure"]);
+    if(audioElement == null) return "";
+    const type = audioElement.getAttribute("type");
+    const url = audioElement.getAttribute("url");
+    return `<audio controls preload="metadata">
+        <source src="${url}" type="${type}">
+        Your browser does not support the audio element.
+    </audio>`
+}
 function elementToFrag(element, url) {
     let link = element.querySelector('link');
     link = (link.innerHTML == null || link.innerHTML == "") ? link.getAttribute("href") : link.innerHTML;
@@ -114,7 +124,9 @@ function elementToFrag(element, url) {
     let descriptionElement = getChild(element, ['content\\:encoded', 'description', 'media\\:description', 'summary']);
     let author = getChild(element, ["author name"]);
     let embed = url.host.includes("youtube.com") ? extractYoutubeEmbed(element) : "";
-        
+    const audio = extractAudioEmbed(element);
+    embed+=audio;
+
     return {
         title : extractCdata(element.querySelector('title').innerHTML),
         host: url.hostname,
