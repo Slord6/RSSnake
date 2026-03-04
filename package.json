@@ -14,7 +14,7 @@
   "author": "Sam Lord",
   "license": "MIT",
   "dependencies": {
-    "jsdom": "^16.7.0",
+    "jsdom": "^28.1.0",
     "node-fetch": "^2.6.7"
   }
 }
